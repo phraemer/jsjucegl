@@ -30,8 +30,9 @@ private:
   void timerCallback() override;
 
   juce::TextButton _button;
-  juce::Label _label;
-  int _counter = 0;
+  juce::Label _frameLabel, _scaleLabel;
+  int _frame = 0;
+  std::atomic<float> _scale = 1.0f;
 
   // This reference is provided as a quick way for your editor to
   // access the processor object that created it.

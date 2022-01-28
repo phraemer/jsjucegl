@@ -11,7 +11,11 @@
 
 //==============================================================================
 NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioProcessor& p)
-  : AudioProcessorEditor(&p), audioProcessor(p), _button("Embiggen", "Click to resize"), _label("0")
+  : AudioProcessorEditor(&p), 
+  audioProcessor(p),
+  _button("Embiggen", "Click to resize"),
+  _frameLabel("0"),
+  _scaleLabel("")
 {
   _openGLContext.attachTo(*getTopLevelComponent());
   _openGLContext.setContinuousRepainting(true);
@@ -45,7 +49,8 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
   };
 
   addAndMakeVisible(_button);
-  addAndMakeVisible(_label);
+  addAndMakeVisible(_frameLabel);
+  addAndMakeVisible(_scaleLabel);
 
   // Make sure that before the constructor has finished, you've set the
   // editor's size to whatever you need it to be.
@@ -64,7 +69,7 @@ void NewProjectAudioProcessorEditor::paint(juce::Graphics& g)
   // (Our component is opaque, so we must completely fill the background with a solid colour)
   g.fillAll(getLookAndFeel().findColour(juce::ResizableWindow::backgroundColourId));
 
-  
+  _scale = g.getInternalContext().getPhysicalPixelScaleFactor();
 }
 
 void NewProjectAudioProcessorEditor::resized()
@@ -74,15 +79,18 @@ void NewProjectAudioProcessorEditor::resized()
 
   auto bounds = getLocalBounds();
 
-  _button.setBounds(bounds.removeFromBottom(50).removeFromLeft(100));
-  _label.setBounds(bounds.removeFromBottom(50).removeFromLeft(100));
+  _button.setBounds(bounds.removeFromBottom(25).removeFromLeft(100));
+  _frameLabel.setBounds(bounds.removeFromBottom(25).removeFromLeft(100));
+  _scaleLabel.setBounds(bounds.removeFromBottom(25).removeFromLeft(100));
 }
 
 void NewProjectAudioProcessorEditor::timerCallback()
 {
-  _counter++;
-  _counter %= 30;
+  _frame++;
+  _frame %= 30;
 
-  _label.setText(juce::var(_counter).toString(), juce::NotificationType::dontSendNotification);
+  _frameLabel.setText("Frame:" + juce::var(_frame).toString(), juce::NotificationType::dontSendNotification);
+  _scaleLabel.setText("Scale: " + juce::var(_scale).toString(), juce::NotificationType::dontSendNotification);
+
   repaint();
 }
