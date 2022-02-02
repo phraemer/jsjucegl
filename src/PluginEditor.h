@@ -11,8 +11,6 @@
 #include <JuceHeader.h>
 #include "PluginProcessor.h"
 
-#define JSJUCEGL_USE_OPENGL
-#define JSJUCEGL_RESIZE_REATTACH_GL
 //==============================================================================
 /**
 */
@@ -38,9 +36,7 @@ private:
   // access the processor object that created it.
   NewProjectAudioProcessor& audioProcessor;
 
-#if defined(JSJUCEGL_USE_OPENGL)
   juce::OpenGLContext _openGLContext;
-#endif
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessorEditor)
 };

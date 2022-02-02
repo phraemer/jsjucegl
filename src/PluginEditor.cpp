@@ -9,43 +9,76 @@
 #include "PluginProcessor.h"
 #include "PluginEditor.h"
 
+class CallOnceAfter : public juce::Timer
+{
+public:
+  CallOnceAfter(const int delayInMS, std::function<void()> callback, bool startTimerNow = true)
+    : _ms(delayInMS), _callback(callback)
+  {
+    if (startTimerNow)
+    {
+      startTimer(_ms);
+    }
+  }
+
+  // Calls the passed callback again after delayInMS if it has been called already
+  void reset(const int delayInMS)
+  {
+    if (!isTimerRunning())
+    {
+      _ms = delayInMS;
+      startTimer(_ms);
+    }
+  }
+
+private:
+  int _ms;
+  std::function<void()> _callback;
+
+  void timerCallback() override
+  {
+    stopTimer();
+    if (_callback)
+    {
+      _callback();
+    }
+  }
+};
+
+namespace {
+  std::unique_ptr<CallOnceAfter> g_callOnce;
+}
+
 //==============================================================================
 NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioProcessor& p)
-  : AudioProcessorEditor(&p), 
+  : AudioProcessorEditor(&p),
   audioProcessor(p),
-  _button("Embiggen", "Click to resize"),
+  _button("Embiggen", "Click to detatch and reattach OpenGL"),
   _frameLabel("0"),
   _scaleLabel("")
 {
+  _openGLContext.setOpenGLVersionRequired(juce::OpenGLContext::OpenGLVersion::openGL3_2);
   _openGLContext.attachTo(*getTopLevelComponent());
-  _openGLContext.setContinuousRepainting(true);
 
   _button.onClick = [this] {
+    g_callOnce = std::make_unique<CallOnceAfter>(5000, [this] {
 
-#if defined(JSJUCEGL_USE_OPENGL) && defined(JSJUCEGL_RESIZE_REATTACH_GL)
-    auto* pComponent = _openGLContext.getTargetComponent();
+      auto* pComponent = _openGLContext.getTargetComponent();
 
-    // Detaching and reattaching prevents a visual stretching effect
-    if (_openGLContext.isAttached())
-    {
-      _openGLContext.detach();
-    }
-#endif
+      DBG("DETACH OPENGL");
 
-    if (getWidth() == 200)
-    {
-      setSize(300, 300);
-      _button.setButtonText("Enshrinken");
-    }
-    else
-    {
-      setSize(200, 200);
-      _button.setButtonText("Embiggen");
-    }
+      // Detaching and reattaching prevents a visual stretching effect
+      if (_openGLContext.isAttached())
+      {
+        _openGLContext.detach();
+      }
 
-#if defined(JSJUCEGL_USE_OPENGL) && defined(JSJUCEGL_RESIZE_REATTACH_GL)
-    _openGLContext.attachTo(*pComponent);
-#endif
+      DBG("RE-ATTACH OPENGL");
+      _openGLContext.attachTo(*pComponent);
+
+      DBG("ATTACHED OPENGL");
+
+      });
   };
 
   addAndMakeVisible(_button);
@@ -54,7 +87,7 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 
   // Make sure that before the constructor has finished, you've set the
   // editor's size to whatever you need it to be.
-  setSize(200, 200);
+  setSize(800, 332);
 
   startTimerHz(30);
 }
