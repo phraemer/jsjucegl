@@ -14,7 +14,7 @@ jobs:
           fetch-depth: 0
 
       - name: CMake Generate
-        run: cmake -Wno-dev --warn-uninitialized -S . -B "./build/" -G "Visual Studio 17 2022" -A x64 -DCMAKE_SYSTEM_VERSION=10.0.19041.0
+        run: cmake -Wno-dev --warn-uninitialized -DCMAKE_SYSTEM_VERSION="10.0.19041.0" -S . -B "./build/" -G "Visual Studio 17 2022" -A x64
 
       - name: CMake Build
         run: cmake --build "./build/" --config "Release"
