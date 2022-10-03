@@ -80,8 +80,13 @@ NewProjectAudioProcessorEditor::NewProjectAudioProcessorEditor(NewProjectAudioPr
 
       });
   };
+  
+  _edit.onReturnKey = []{
+    DBG("TextEdit return key");
+  };
 
   addAndMakeVisible(_button);
+  addAndMakeVisible(_edit);
   addAndMakeVisible(_frameLabel);
   addAndMakeVisible(_scaleLabel);
 
@@ -113,6 +118,7 @@ void NewProjectAudioProcessorEditor::resized()
   auto bounds = getLocalBounds();
 
   _button.setBounds(bounds.removeFromBottom(25).removeFromLeft(100));
+  _edit.setBounds(bounds.removeFromBottom(25).removeFromLeft(100));
   _frameLabel.setBounds(bounds.removeFromBottom(25).removeFromLeft(100));
   _scaleLabel.setBounds(bounds.removeFromBottom(25).removeFromLeft(100));
 }

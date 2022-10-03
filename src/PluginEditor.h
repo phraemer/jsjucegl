@@ -27,15 +27,16 @@ public:
 private:
   void timerCallback() override;
 
-  juce::TextButton _button;
-  juce::Label _frameLabel, _scaleLabel;
-  int _frame = 0;
-  std::atomic<float> _scale = 1.0f;
-
   // This reference is provided as a quick way for your editor to
   // access the processor object that created it.
   NewProjectAudioProcessor& audioProcessor;
 
+  juce::TextButton _button;
+  juce::TextEditor _edit;
+  juce::Label _frameLabel, _scaleLabel;
+  int _frame = 0;
+  std::atomic<float> _scale = 1.0f;
+  
   juce::OpenGLContext _openGLContext;
 
   JUCE_DECLARE_NON_COPYABLE_WITH_LEAK_DETECTOR(NewProjectAudioProcessorEditor)
